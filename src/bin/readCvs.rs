@@ -8,8 +8,6 @@ use std::env;
 use std::error::Error;
 use std::ffi::OsString;
 use std::fs::File;
-use std::io;
-use std::process;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Movie {
@@ -45,12 +43,17 @@ fn return_movies_json(movies: Vec<Movie>) -> Result<std::string::String, serde_j
     return dr;
 }
 
-fn main() {
-    println!("Hello, world!");
+pub fn option_json_data() -> Option<Result<std::string::String, serde_json::Error>>{
     let movies = read_movies_from_file();
     let json_data = match movies {
         Err(_) => None,
         Ok(data) => Some(return_movies_json(data)),
     };
+    return json_data;
+}
+
+fn main() {
+    println!("Hello, world!");
+    let json_data = option_json_data();
     println!("{:?}", json_data);
 }
