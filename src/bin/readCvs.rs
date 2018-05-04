@@ -37,21 +37,20 @@ fn read_movies_from_file() -> Result<Vec<Movie>, Box<Error>> {
     Ok(stack)
 }
 
-fn return_movies_json(movies: Vec<Movie>) {
-    let dr = movies.iter()
-    .map(|ref y| serde_json::to_string(&y));
-    println!("data: {:?}", dr);
+fn return_movies_json(movies: Vec<Movie>) -> Result<std::string::String, serde_json::Error> {
+    let dr: Result<std::string::String, serde_json::Error> = movies
+        .iter()
+        .map(|ref y| serde_json::to_string(&y))
+        .collect();
+    return dr;
 }
-
-// fn search_movie()
 
 fn main() {
     println!("Hello, world!");
     let movies = read_movies_from_file();
-     match movies {
-        Err(_) => println!("Hello, world!"),
-        Ok(data) => return_movies_json(data),
+    let json_data = match movies {
+        Err(_) => None,
+        Ok(data) => Some(return_movies_json(data)),
     };
-    // println!("data: {:?}", movies);
-
+    println!("{:?}", json_data);
 }
