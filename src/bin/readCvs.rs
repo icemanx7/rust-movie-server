@@ -23,23 +23,21 @@ fn get_first_arg() -> Result<OsString, Box<Error>> {
     }
 }
 
-fn read_movies_from_file() -> Result<(), Box<Error>> {
+fn read_movies_from_file() -> Result<Vec<Movie>, Box<Error>> {
+    let mut stack = Vec::new();
     let file_path = get_first_arg()?;
     let file = File::open(file_path)?;
     let mut rdr = csv::Reader::from_reader(file);
     for result in rdr.deserialize() {
-        // The iterator yields Result<StringRecord, Error>, so we check the
-        // error here.
         let record: Movie = result?;
-        println!("{:?}", record);
+        stack.push(record);
     }
-    Ok(())
+    Ok(stack)
 }
 
 fn main() {
     println!("Hello, world!");
-     if let Err(err) = read_movies_from_file() {
-        println!("error running example: {}", err);
-        process::exit(1);
-    }
+    let movies = read_movies_from_file();
+    println!("data: {:?}", movies);
+
 }
