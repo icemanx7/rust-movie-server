@@ -1,4 +1,6 @@
 extern crate csv;
+extern crate serde;
+extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
@@ -9,7 +11,7 @@ use std::fs::File;
 use std::io;
 use std::process;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Movie {
     ID: i32,
     Name: String,
@@ -35,9 +37,21 @@ fn read_movies_from_file() -> Result<Vec<Movie>, Box<Error>> {
     Ok(stack)
 }
 
+fn return_movies_json(movies: Vec<Movie>) {
+    let dr = movies.iter()
+    .map(|ref y| serde_json::to_string(&y));
+    println!("data: {:?}", dr);
+}
+
+// fn search_movie()
+
 fn main() {
     println!("Hello, world!");
     let movies = read_movies_from_file();
-    println!("data: {:?}", movies);
+     match movies {
+        Err(_) => println!("Hello, world!"),
+        Ok(data) => return_movies_json(data),
+    };
+    // println!("data: {:?}", movies);
 
 }
