@@ -8,11 +8,11 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
+use rocket_contrib::Json;
 use std::env;
 use std::error::Error;
 use std::ffi::OsString;
 use std::fs::File;
-use rocket_contrib::Json;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Movie {
@@ -53,16 +53,14 @@ fn get_data_in_string() -> std::string::String {
     let json_data: Option<Result<std::string::String, serde_json::Error>> = option_json_data();
     let string_data = match json_data {
         Some(data) => match data {
-        Ok(datas) => datas,
-        Err(_) => String::from("")}
-        ,
+            Ok(datas) => datas,
+            Err(_) => String::from(""),
+        },
         None => String::from(""),
     };
     println!("{:?}", string_data);
-    return string_data.replace("\"","\"");
+    return string_data.replace("\"", "\"");
 }
-
-
 
 #[get("/")]
 fn index() -> Json<std::string::String> {
