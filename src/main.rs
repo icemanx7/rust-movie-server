@@ -1,7 +1,8 @@
 #![feature(plugin)]
 #![plugin(rocket_codegen)]
-extern crate rocket;
 extern crate csv;
+extern crate rocket;
+extern crate rocket_contrib;
 extern crate serde;
 extern crate serde_json;
 #[macro_use]
@@ -11,6 +12,7 @@ use std::env;
 use std::error::Error;
 use std::ffi::OsString;
 use std::fs::File;
+use rocket_contrib::Json;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Movie {
@@ -38,7 +40,7 @@ fn return_movies_json(movies: Vec<Movie>) -> Result<std::string::String, serde_j
     return dr;
 }
 
-fn option_json_data() -> Option<Result<std::string::String, serde_json::Error>>{
+fn option_json_data() -> Option<Result<std::string::String, serde_json::Error>> {
     let movies = read_movies_from_file();
     let json_data = match movies {
         Err(_) => None,
@@ -47,10 +49,24 @@ fn option_json_data() -> Option<Result<std::string::String, serde_json::Error>>{
     return json_data;
 }
 
+fn get_data_in_string() -> std::string::String {
+    let json_data: Option<Result<std::string::String, serde_json::Error>> = option_json_data();
+    let string_data = match json_data {
+        Some(data) => match data {
+        Ok(datas) => datas,
+        Err(_) => String::from("")}
+        ,
+        None => String::from(""),
+    };
+    println!("{:?}", string_data);
+    return string_data.replace("\"","\"");
+}
+
+
+
 #[get("/")]
-fn index() -> &'static str {
-    option_json_data();
-    "Hello, world!"
+fn index() -> Json<std::string::String> {
+    Json(get_data_in_string())
 }
 
 #[get("/id")]
@@ -64,9 +80,10 @@ fn get_number_movies() -> &'static str {
 }
 
 fn main() {
+    let json_data = option_json_data();
     rocket::ignite()
-    .mount("/", routes![index])
-    .mount("/", routes![get_movie])
-    .mount("/", routes![get_number_movies])
-    .launch();
+        .mount("/", routes![index])
+        .mount("/", routes![get_movie])
+        .mount("/", routes![get_number_movies])
+        .launch();
 }
