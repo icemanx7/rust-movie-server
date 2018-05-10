@@ -9,9 +9,7 @@ extern crate serde_json;
 extern crate serde_derive;
 
 use rocket_contrib::Json;
-use std::env;
 use std::error::Error;
-use std::ffi::OsString;
 use std::fs::File;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -78,7 +76,6 @@ fn get_number_movies() -> &'static str {
 }
 
 fn main() {
-    let json_data = option_json_data();
     rocket::ignite()
         .mount("/", routes![index])
         .mount("/", routes![get_movie])
