@@ -19,6 +19,17 @@ struct Movie {
     Year: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct Movies {
+    movies: Vec<Movie>,
+}
+
+impl Default for Movies {
+    fn default() -> Movies {
+        Movies { movies: Vec::new() }
+    }
+}
+
 fn read_movies_from_file() -> Result<Vec<Movie>, Box<Error>> {
     let mut stack = Vec::new();
     let file = File::open("./data.csv")?;
@@ -38,31 +49,36 @@ fn return_movies_json(movies: Vec<Movie>) -> Result<std::string::String, serde_j
     return dr;
 }
 
-fn option_json_data() -> Option<Result<std::string::String, serde_json::Error>> {
-    let movies = read_movies_from_file();
-    let json_data = match movies {
+fn option_json_data() -> Option<Movies> {
+    let movies_data = read_movies_from_file();
+    let json_data = match movies_data {
         Err(_) => None,
-        Ok(data) => Some(return_movies_json(data)),
+        Ok(data) => Some(Movies { movies: data }),
     };
     return json_data;
 }
 
-fn get_data_in_string() -> std::string::String {
-    let json_data: Option<Result<std::string::String, serde_json::Error>> = option_json_data();
-    let string_data = match json_data {
-        Some(data) => match data {
-            Ok(datas) => datas,
-            Err(_) => String::from(""),
-        },
-        None => String::from(""),
-    };
-    println!("{:?}", string_data);
-    return string_data.replace("\"", "\"");
-}
+// fn get_data_in_string() -> std::string::String {
+//     let json_data: Option<Result<std::string::String, serde_json::Error>> = option_json_data();
+//     let string_data = match json_data {
+//         Some(data) => match data {
+//             Ok(datas) => datas,
+//             Err(_) => String::from(""),
+//         },
+//         None => String::from(""),
+//     };
+//     println!("{:?}", string_data);
+//     return string_data.replace("\"", "");
+// }
 
 #[get("/")]
-fn index() -> Json<std::string::String> {
-    Json(get_data_in_string())
+fn index() -> Json<Movies> {
+    let datas = option_json_data();
+    let send_data = match datas {
+        Some(json) => json,
+        None => Movies::default(),
+    };
+    Json(send_data)
 }
 
 #[get("/id")]
