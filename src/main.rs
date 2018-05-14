@@ -41,14 +41,6 @@ fn read_movies_from_file() -> Result<Vec<Movie>, Box<Error>> {
     Ok(stack)
 }
 
-fn return_movies_json(movies: Vec<Movie>) -> Result<std::string::String, serde_json::Error> {
-    let dr: Result<std::string::String, serde_json::Error> = movies
-        .iter()
-        .map(|ref y| serde_json::to_string(&y))
-        .collect();
-    return dr;
-}
-
 fn option_json_data() -> Option<Movies> {
     let movies_data = read_movies_from_file();
     let json_data = match movies_data {
@@ -57,19 +49,6 @@ fn option_json_data() -> Option<Movies> {
     };
     return json_data;
 }
-
-// fn get_data_in_string() -> std::string::String {
-//     let json_data: Option<Result<std::string::String, serde_json::Error>> = option_json_data();
-//     let string_data = match json_data {
-//         Some(data) => match data {
-//             Ok(datas) => datas,
-//             Err(_) => String::from(""),
-//         },
-//         None => String::from(""),
-//     };
-//     println!("{:?}", string_data);
-//     return string_data.replace("\"", "");
-// }
 
 #[get("/")]
 fn index() -> Json<Movies> {
